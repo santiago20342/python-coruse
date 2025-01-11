@@ -3,6 +3,15 @@ import pygame
 from sys import exit 
 from random import randint
 
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()   
+        self.image = pygame.image.load('graphics\\Player\\player_walk_1.png').convert_alpha()
+        self.rect = self.image.get_rect(midbottom = (200,300))
+
+
+
+
 def display_score():
     current_time = int(pygame.time.get_ticks() / 1000) - start_time
     score_surf = test_font.render(f'Score: {current_time}',False,(64,64,64))
@@ -28,7 +37,6 @@ def collisions(player,obstacles):
             if player.colliderect(obstacle_rect):return False
     return True  
 
-
 def player_animation():
     global player_surf, player_index
 
@@ -39,10 +47,6 @@ def player_animation():
         if player_index >= len(player_walk):player_index = 0
         player_surf = player_walk[int(player_index)]
 
-         
-
-
-
 pygame.init()
 screen = pygame.display.set_mode((800,400))
 pygame.display.set_caption('clone trex game')   
@@ -51,6 +55,9 @@ test_font = pygame.font.Font('font\\Pixeltype.ttf',50)
 game_active = False
 start_time = 0
 score = 0
+
+player = pygame.sprite.GroupSingle()
+player.add(Player())
 
 sky_surface = pygame.image.load('graphics\\Sky.png').convert()
 ground_surface = pygame.image.load('graphics\\ground.png').convert()
@@ -74,6 +81,7 @@ fly_surf = fly_frames[fly_frame_index]
 
 obstacle_rect_list = []
 
+#player
 player_walk_1 = pygame.image.load('graphics\\Player\\player_walk_1.png').convert_alpha()
 player_walk_2 = pygame.image.load('graphics\\Player\\player_walk_2.png').convert_alpha()
 player_walk = [player_walk_1,player_walk_2]
@@ -158,6 +166,7 @@ while True:
         if player_rect.bottom >= 300: player_rect.bottom = 300
         player_animation()
         screen.blit(player_surf,player_rect)
+        player.draw(screen)
 
         #obstacle movement 
         obstacle_rect_list = obstacle_movement(obstacle_rect_list)
