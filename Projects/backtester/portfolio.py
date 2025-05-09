@@ -11,9 +11,31 @@ class Portfolio:
             if self.holdings[symbol] <= 0:
                 del self.holdings[symbol]
 
-    def get_portfolio_value(self, price_dict):
-        total_value = 0
-        for symbol, units in self.holdings.items():
-            price = price_dict.get(symbol, 0)
-            total_value += units * price
-        return total_value
+    def get_portfolio_value(self, price_df):
+        portfolio_value = 0
+        for symbol, amount in self.holdings.items():
+            #print(f"Symbol: {symbol}, Amount: {amount}")
+            price = price_df[symbol]['2024-12-31']#example date, need to be dynamic
+            value = amount * price
+            #print(f"Value for {symbol}: {value}")
+            portfolio_value += value
+        return portfolio_value
+
+
+# Example usage
+from data_fetch import get_price
+
+shares = ['AAPL', 'MSFT', 'GOOG', 'AMZN', 'TSLA', 'NVDA', 'NFLX']
+portfolio = Portfolio()
+for symbol in shares:
+    portfolio.add_asset(symbol, 1)
+
+
+
+start = '2024-01-01'
+end = '2025-01-01'
+
+prices_df = get_price(shares, start, end)
+prices_close_df = prices_df['Close']
+
+print("Portfolio Value:", portfolio.get_portfolio_value(prices_close_df))
