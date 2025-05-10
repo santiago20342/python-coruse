@@ -1,5 +1,5 @@
 ## a list of pending features for the Platform
-0. need to adapt code to handle more than 5 stock dynamically
+done(0. need to adapt code to handle more than 5 stock dynamically)
 1. add a way to set the number of stock on every share, since now it's creating all with a default of 1 each
 2. make dates dynamic, and choose newest available date to calculate portfolio value
 3. create plot visualisations of different portfolios
