@@ -1,7 +1,8 @@
 ## a list of pending features for the Platform
 done(0. need to adapt code to handle more than 5 stock dynamically)
 done(1. add a way to set the number of stock on every share, since now it's creating all with a default of 1 each)
-2. make dates dynamic, and choose newest available date to calculate portfolio value
+done(2. make dates dynamic, and choose newest available date to calculate portfolio value)
+2.1 change code to take in date objects, and calculate portfolio value for different dates, as well as over time.
 3. create plot visualisations of different portfolios
 4. create plot visualisations for the value across time of different portfolios. 
 4.1 Add a date for purchase of the stock. (add default values too)
