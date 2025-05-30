@@ -1,5 +1,5 @@
 import yfinance as yf
 
-def get_price(symbol, start, end):
-    data = yf.download(symbol, start=start, end=end)
+def get_price(symbol):
+    data = yf.download(symbol, period='max', interval='1d', rounding=True)
     return data
