@@ -5,6 +5,7 @@ done(2. make dates dynamic, and choose newest available date to calculate portfo
 done(2.1 change code to take in date objects, and calculate portfolio value for different dates, as well as over time.)
 done(2.1.1 CHANGE DATE INSIDE PORTFOLIO TO USE STR WHEN FILTERING THE DATAFRAME. )
 2.2 Correct bug= not calculating portfolio value dynamically. It is only always calculating with portfolio value for latest date
+Use time deltas 
 3. create plot visualisations of different portfolios
 4. create plot visualisations for the value across time of different portfolios. 
 4.1 Add a date for purchase of the stock. (add default values too)
