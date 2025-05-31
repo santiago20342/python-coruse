@@ -53,7 +53,7 @@ class Portfolio:
             float: The total value of the portfolio at the given date.
         '''
 
-        date = date.strftime('%Y-%m-%d')  # Ensure date is in string format #1
+        # date = date.strftime('%Y-%m-%d')  # Ensure date is in string format #1
         portfolio_value = 0
         for symbol, amount in self.holdings.items():
             print(f"Calculating Symbol: {symbol}, Amount: {amount}, Date: {date}")
