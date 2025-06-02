@@ -1,4 +1,21 @@
-import datetime
+import pandas as pd
+
+def get_closest_date_index(date, df_original):
+    """
+    Get the index of the closest date in a list of dates.
+    Args:
+        date (timestamp): The date to find the closest match for.
+        date_series (pandas.Series): A pandas series of pandas.Timestamp objects.
+    Returns:
+        int: The index of the closest date in the list.
+    """
+    # getting the closest date index
+    df_with_dates = df_original.copy()
+    df_with_dates['timedeltas'] = abs(df_with_dates.index - date)
+    min_diff = min(df_with_dates['timedeltas'])
+    # Calculate the difference between the last date in the DataFrame and today
+    index = df_with_dates['timedeltas'].isin([min_diff]).idxmax()
+    return index
 
 class Portfolio:
     """
@@ -44,11 +61,11 @@ class Portfolio:
             if self.holdings[symbol] <= 0:
                 del self.holdings[symbol]
 
-    def get_portfolio_value(self, closing_data_df, date= datetime.date.today()):
+    def get_portfolio_value(self, closing_data_df, date= pd.Timestamp.today()):
         '''Calculate the total value of the portfolio at a given date.
         Args:
             closing_data_df (DataFrame): A DataFrame containing the closing prices of assets with dates as index.
-            date (datetime.date): The date for which to calculate the portfolio value. Defaults to today.
+            date (pandas.Timestamp): The date for which to calculate the portfolio value. Defaults to today.
         Returns:
             float: The total value of the portfolio at the given date.
         '''
@@ -56,11 +73,11 @@ class Portfolio:
         # date = date.strftime('%Y-%m-%d')  # Ensure date is in string format #1
         portfolio_value = 0
         for symbol, amount in self.holdings.items():
-            print(f"Calculating Symbol: {symbol}, Amount: {amount}, Date: {date}")
+            print(f"Calculating Symbol: {symbol}, Amount: {amount}, input Date: {date}")
             if date not in closing_data_df[symbol].index: # CHANGE CODE TO GET DATA FROM CLOSEST DATE TO THE GIVEN DATE
                 print(f"Price for {symbol} on {date} is not available. calculating with the latest available")
                 #change today to the latest available date in price_df
-                date = closing_data_df[symbol].index[-1]  # Get the last available date #2 Latest date works if we want to know closest price to today, for other dates need to calculate timedelta
+                date = get_closest_date_index(date, closing_data_df) # Get the last available date #2 Latest date works if we want to know closest price to today, for other dates need to calculate timedelta
                 print(f"Using latest available date: {date}")
             price = float(closing_data_df[symbol][date])#example date, need to be dynamic
             value = amount * price
