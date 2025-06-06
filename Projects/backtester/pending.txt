@@ -1,13 +1,22 @@
 ## a list of pending features for the Platform
-done(0. need to adapt code to handle more than 5 stock dynamically)
-done(1. add a way to set the number of stock on every share, since now it's creating all with a default of 1 each)
-done(2. make dates dynamic, and choose newest available date to calculate portfolio value)
-done(2.1 change code to take in date objects, and calculate portfolio value for different dates, as well as over time.)
-done(2.1.1 CHANGE DATE INSIDE PORTFOLIO TO USE STR WHEN FILTERING THE DATAFRAME. )
-2.2 Correct bug= not calculating portfolio value dynamically. It is only always calculating with portfolio value for latest date
-Use time deltas 
-Turn date column to date time objects for ease of calculation
-3. create plot visualisations of different portfolios
-4. create plot visualisations for the value across time of different portfolios. 
-4.1 Add a date for purchase of the stock. (add default values too)
-4.2 Add the number of stock held in the prices_df so we can track the value of the portfolio across time. 
+tshirt  status  task
+-----   -----   ----------------------------------------------------------------
+s       done    0. need to adapt code to handle more than 5 stock dynamically
+xs      done    1. add a way to set the number of stock on every share, since now it's creating all with a default of 1 each)
+m       done    2. make dates dynamic, and choose newest available date to calculate portfolio value)
+m       done    2.1 change code to take in date objects, and calculate portfolio value for different dates, as well as over time.)
+s       done    2.1.1 CHANGE DATE INSIDE PORTFOLIO TO USE STR WHEN FILTERING THE DATAFRAME. )
+s       done    2.2 Correct bug= not calculating portfolio value dynamically. It is only always calculating with portfolio value for latest date)
+s       done    2.3 Use time deltas, turn date column to date time objects for ease of calculation)
+s       done    3. create plot visualisations of different portfolios 
+s       done    4. create plot visualisations for the value across time of different portfolios. 
+l       pend    ADVANCED FEATURE 4.1 Add a date for purchase of the stock. (add default values too)
+l       pend    ADVANCED FEATURE 4.2 Add the number of stock held in the prices_df so we can track the value of the portfolio across time. 
+s       pend    5. find website/API for congressmen investments and verify
+s/l     pend    5.1 get the data from the website. 
+s       pend    5.1.1a API (easy)
+l       pend    5.1.1b Web Scrapping (more or less 1 week of work)
+l       pend    6. build an index of congress investments to replicate. 
+m/xl    pend    6.1 backtesting of strategies. 
+m/l     pend    7. Automatic updating of the data (raspberry)
+xl      pend    8. Front-End interface for interacting with the platform.

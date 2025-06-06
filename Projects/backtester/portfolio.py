@@ -30,6 +30,7 @@ class Portfolio:
             where symbol is the key to the dictionary, and it is a string of 4 letters (as per the normal stock symbol format), 
             and units is a float representing the number of units held of that asset.'''
         self.holdings = {}  # {symbol: units}
+        self.value = 0.0
 
     def add_asset(self, symbol, units):
         '''Add an asset to the portfolio.
@@ -80,9 +81,12 @@ class Portfolio:
                 date = get_closest_date_index(date, closing_data_df) # Get the last available date #2 Latest date works if we want to know closest price to today, for other dates need to calculate timedelta
                 print(f"Using latest available date: {date}")
             price = float(closing_data_df[symbol][date])#example date, need to be dynamic
+            if type(price) is not float:
+                price = 0
             value = amount * price
             print(f"Value for {symbol}: {value}")
             portfolio_value += float(value)
+            self.value = portfolio_value
             print(f"Current Portfolio Value: {portfolio_value}")
         return portfolio_value
 
