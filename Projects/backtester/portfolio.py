@@ -24,13 +24,16 @@ class Portfolio:
         holdings (dict): A dictionary where keys are asset symbols and values are the number of units held.
     """
 
-    def __init__(self):
+    def __init__(self, first_name, last_name):
         '''Initialize the portfolio with an empty dictionary to hold assets.
             Dictionary structure: {symbol: units}
             where symbol is the key to the dictionary, and it is a string of 4 letters (as per the normal stock symbol format), 
             and units is a float representing the number of units held of that asset.'''
         self.holdings = {}  # {symbol: units}
         self.value = 0.0
+        self.first_name = first_name
+        self.last_name = last_name
+        self.full_name = f"{self.first_name} {self.last_name}"
 
     def add_asset(self, symbol, units):
         '''Add an asset to the portfolio.
