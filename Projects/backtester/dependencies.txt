@@ -1,0 +1,16 @@
+# outside information used for this Project
+
+Original idea:
+https://www.insiderfinance.io/congress-trades
+
+FINANCIAL MODELLING PREP (FMP)
+site:https://site.financialmodelingprep.com
+specific information: https://site.financialmodelingprep.com/developer/docs/stable/senate-latest?utm_source=chatgpt.com
+API: https://site.financialmodelingprep.com/playground/stable?url=senate-latest
+
+SENATE REPRESENTATIVES LIST updated
+congress-legislators github repo: https://github.com/unitedstates/congress-legislators?tab=readme-ov-file
+where the "legislators-current" 
+- csv:https://unitedstates.github.io/congress-legislators/legislators-current.csv
+-json: https://unitedstates.github.io/congress-legislators/legislators-current.json
+- yaml:https://unitedstates.github.io/congress-legislators/legislators-current.yaml

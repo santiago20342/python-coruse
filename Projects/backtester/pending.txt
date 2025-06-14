@@ -13,8 +13,9 @@ s       done    2.2     Correct bug= not calculating portfolio value dynamically
 s       done    2.3     Use time deltas, turn date column to date time objects for ease of calculation)
 s       done    3.      create plot visualisations of different portfolios 
 s       done    4.      create plot visualisations for the value across time of different portfolios. 
-l       PEND    4.1     ADVANCED FEATURE Add a date for purchase of the stock. (add default values too)
+l       PEND    4.1     ADVANCED FEATURE Add a date for purchase of the stock, portfolio across time. (add default values too)
 l       PEND    4.2     ADVANCED FEATURE Add the number of stock held in the prices_df so we can track the value of the portfolio across time. 
+s       done    4.3     Database of objects -> dictionary
 
 DATA ACQUISITION
 ------------------------
