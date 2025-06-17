@@ -15,6 +15,9 @@ s       done    3.      create plot visualisations of different portfolios
 s       done    4.      create plot visualisations for the value across time of different portfolios. 
 l       PEND    4.1     ADVANCED FEATURE Add a date for purchase of the stock, portfolio across time. (add default values too)
 l       PEND    4.2     ADVANCED FEATURE Add the number of stock held in the prices_df so we can track the value of the portfolio across time. 
+m       PEND    4.2.1   Edit the portfolio value funcition to calculate based on the new portfolio data structure
+s       PEND    4.2.2   add a capital gains variable to keep track.
+s       PEND    4.2.3   Create a baseline budget, to keep track of networth across time. 
 s       done    4.3     Database of objects -> dictionary
 
 DATA ACQUISITION

@@ -29,15 +29,17 @@ class Portfolio:
             Dictionary structure: {symbol: units}
             where symbol is the key to the dictionary, and it is a string of 4 letters (as per the normal stock symbol format), 
             and units is a float representing the number of units held of that asset.'''
-        self.holdings = {}  # {symbol: units}
+        self.holdings = [] #queue
+        self.holdings_dates = []#queue
         self.value = 0.0
         self.first_name = first_name
         self.last_name = last_name
         self.full_name = f"{self.first_name} {self.last_name}"
 
-    def add_asset(self, symbol, units):
+    def add_asset(self, symbol, units, buy_date):
         '''Add an asset to the portfolio.
         If the asset already exists, it will update the number of units held.
+        If runnning several times, make sure dates are in chronological order.
         Args:
             symbol (str): The symbol of the asset to add.
             units (float): The number of units to add.
@@ -49,18 +51,41 @@ class Portfolio:
             raise ValueError("Symbol must be exactly 4 characters long.")
         if units < 0:
             raise ValueError("Units cannot be negative.")
+        if buy_date is None or not isinstance(buy_date, pd.Timestamp):
+            raise ValueError("Buy date must be a valid pandas Timestamp.")
         
         # Add asset to the portfolio
-        if symbol in self.holdings:
-            self.holdings[symbol] += float(units)
+        #check if the date provided is already in the holdings_dates queue
+        if buy_date in self.holdings_dates:
+            index = self.holdings_dates.index(buy_date)
+            #if the symbol is already in the holdings, update the units
+            if symbol in self.holdings[index]:
+                self.holdings[index][symbol] += float(units)
+            else:
+                self.holdings[index][symbol] = float(units)
         else:
-            self.holdings[symbol] = float(units)
+            #if the date is not in the holdings_dates queue, add a new entry
+            self.holdings_dates.append(buy_date)
+            self.holdings.append({symbol: float(units)})
             
         
 
-    def remove_asset(self, symbol, units):
-        '''Remove an asset from the portfolio.'''
-        if symbol in self.holdings:
+    def remove_asset(self, symbol, units, sell_date):
+        '''Remove an asset from the portfolio by selling a certain number of units.
+        If  running several times, make sure dates are in chronological order.
+        Args:
+            symbol (str): The symbol of the asset to remove.
+            units (float): The number of units to remove.
+            sell_date (pandas.Timestamp): The date on which the asset is sold.
+        '''
+        #check if the sell date is in the holdings_dates queue
+        if sell_date not in self.holdings_dates:
+            #copy the portfolio from last available date
+            self.holdings.append(self.holdings[-1].copy())# copy data so it is not connected to the original in case of changing
+            self.holdings_dates.append(sell_date)
+        # Get the last available date
+        #check if the symbol is in the holdings
+        if symbol in self.holdings[-1]:
             self.holdings[symbol] -= units
             if self.holdings[symbol] <= 0:
                 del self.holdings[symbol]
