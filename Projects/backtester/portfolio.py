@@ -24,14 +24,13 @@ class Portfolio:
         holdings (dict): A dictionary where keys are asset symbols and values are the number of units held.
     """
 
-    def __init__(self, first_name, last_name):
+    def __init__(self, first_name, last_name, holdings):
         '''Initialize the portfolio with an empty dictionary to hold assets.
             Dictionary structure: {symbol: units}
             where symbol is the key to the dictionary, and it is a string of 4 letters (as per the normal stock symbol format), 
             and units is a float representing the number of units held of that asset.'''
-        self.holdings = [] #queue
-        self.holdings_dates = []#queue
-        self.value = 0.0
+        self.holdings = holdings #dictionary
+        
         self.first_name = first_name
         self.last_name = last_name
         self.full_name = f"{self.first_name} {self.last_name}"
@@ -51,22 +50,22 @@ class Portfolio:
             raise ValueError("Symbol must be exactly 4 characters long.")
         if units < 0:
             raise ValueError("Units cannot be negative.")
-        if buy_date is None or not isinstance(buy_date, pd.Timestamp):
-            raise ValueError("Buy date must be a valid pandas Timestamp.")
+        #if buy_date is None or not isinstance(buy_date, pd.Timestamp):
+        #   raise ValueError("Buy date must be a valid pandas Timestamp.")
         
         # Add asset to the portfolio
-        #check if the date provided is already in the holdings_dates queue
-        if buy_date in self.holdings_dates:
-            index = self.holdings_dates.index(buy_date)
-            #if the symbol is already in the holdings, update the units
-            if symbol in self.holdings[index]:
-                self.holdings[index][symbol] += float(units)
-            else:
-                self.holdings[index][symbol] = float(units)
+        #check if the date provided is already in the holdings
+        if buy_date not in self.holdings.keys():
+            date_list = list(sorted(self.holdings.keys()))
+            # Sort the dates to get the last available date
+            self.holdings[buy_date] = self.holdings[date_list[-1]].copy() #copying last portfolio state
+        
+        if symbol in self.holdings[buy_date].keys():
+            self.holdings[buy_date][symbol] += units
         else:
-            #if the date is not in the holdings_dates queue, add a new entry
-            self.holdings_dates.append(buy_date)
-            self.holdings.append({symbol: float(units)})
+            self.holdings[buy_date][symbol] = units
+        
+            
             
         
 
@@ -79,18 +78,21 @@ class Portfolio:
             sell_date (pandas.Timestamp): The date on which the asset is sold.
         '''
         #check if the sell date is in the holdings_dates queue
-        if sell_date not in self.holdings_dates:
+        if sell_date not in self.holdings.keys():
+            date_list = list(sorted(self.holdings.keys()))
             #copy the portfolio from last available date
-            self.holdings.append(self.holdings[-1].copy())# copy data so it is not connected to the original in case of changing
-            self.holdings_dates.append(sell_date)
+            self.holdings[sell_date] = self.holdings[date_list[-1]].copy()# copy data so it is not connected to the original in case of changing
         # Get the last available date
         #check if the symbol is in the holdings
-        if symbol in self.holdings[-1]:
-            self.holdings[symbol] -= units
-            if self.holdings[symbol] <= 0:
-                del self.holdings[symbol]
+        if symbol in self.holdings[sell_date].keys():
+            self.holdings[sell_date][symbol] -= units
+            if self.holdings[sell_date][symbol] < 0:
+                self.holdings[sell_date][symbol] = 0
 
-    def get_portfolio_value(self, closing_data_df, date= pd.Timestamp.today()):
+                
+
+
+    def get_portfolio_value(self, closing_data_df):
         '''Calculate the total value of the portfolio at a given date.
         Args:
             closing_data_df (DataFrame): A DataFrame containing the closing prices of assets with dates as index.
@@ -98,23 +100,32 @@ class Portfolio:
         Returns:
             float: The total value of the portfolio at the given date.
         '''
+        # Turn self.holdings and self.holdings_dates into a DataFrame
+        df = pd.DataFrame(self.holdings)
+        df= df.T
+
+
+
 
         # date = date.strftime('%Y-%m-%d')  # Ensure date is in string format #1
         portfolio_value = 0
-        for symbol, amount in self.holdings.items():
-            print(f"Calculating Symbol: {symbol}, Amount: {amount}, input Date: {date}")
-            if date not in closing_data_df[symbol].index: # CHANGE CODE TO GET DATA FROM CLOSEST DATE TO THE GIVEN DATE
-                print(f"Price for {symbol} on {date} is not available. calculating with the latest available")
-                #change today to the latest available date in price_df
-                date = get_closest_date_index(date, closing_data_df) # Get the last available date #2 Latest date works if we want to know closest price to today, for other dates need to calculate timedelta
-                print(f"Using latest available date: {date}")
-            price = float(closing_data_df[symbol][date])#example date, need to be dynamic
-            if type(price) is not float:
-                price = 0
-            value = amount * price
-            print(f"Value for {symbol}: {value}")
-            portfolio_value += float(value)
-            self.value = portfolio_value
-            print(f"Current Portfolio Value: {portfolio_value}")
+        for i, date in enumerate(self.holdings_dates):
+            for symbol, amount in self.holdings[i].items():
+                print(f"Calculating Symbol: {symbol}, Amount: {amount}, input Date: {date}")
+                if date not in closing_data_df[symbol].index: # CHANGE CODE TO GET DATA FROM CLOSEST DATE TO THE GIVEN DATE
+                    print(f"Price for {symbol} on {date} is not available. calculating with the latest available")
+                    #change today to the latest available date in price_df
+                    date = get_closest_date_index(date, closing_data_df) # Get the last available date #2 Latest date works if we want to know closest price to today, for other dates need to calculate timedelta
+                    print(f"Using latest available date: {date}")
+                price = float(closing_data_df[symbol][date])#example date, need to be dynamic
+                if type(price) is not float:
+                    price = 0
+                value = amount * price
+                print(f"Value for {symbol}: {value}")
+                portfolio_value += float(value)
+                print(f"Current Portfolio Value: {portfolio_value}")
+        
+        
+        
         return portfolio_value
 
