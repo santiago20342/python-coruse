@@ -1,22 +1,5 @@
 import pandas as pd
 
-def get_closest_date_index(date, df_original):
-    """
-    Get the index of the closest date in a list of dates.
-    Args:
-        date (timestamp): The date to find the closest match for.
-        date_series (pandas.Series): A pandas series of pandas.Timestamp objects.
-    Returns:
-        int: The index of the closest date in the list.
-    """
-    # getting the closest date index
-    df_with_dates = df_original.copy()
-    df_with_dates['timedeltas'] = abs(df_with_dates.index - date)
-    min_diff = min(df_with_dates['timedeltas'])
-    # Calculate the difference between the last date in the DataFrame and today
-    index = df_with_dates['timedeltas'].isin([min_diff]).idxmax()
-    return index
-
 class Portfolio:
     """
     A class to represent a portfolio of assets.
@@ -63,10 +46,7 @@ class Portfolio:
         if symbol in self.holdings[buy_date].keys():
             self.holdings[buy_date][symbol] += units
         else:
-            self.holdings[buy_date][symbol] = units
-        
-            
-            
+            self.holdings[buy_date][symbol] = units    
         
 
     def remove_asset(self, symbol, units, sell_date):
@@ -87,9 +67,7 @@ class Portfolio:
         if symbol in self.holdings[sell_date].keys():
             self.holdings[sell_date][symbol] -= units
             if self.holdings[sell_date][symbol] < 0:
-                self.holdings[sell_date][symbol] = 0
-
-                
+                self.holdings[sell_date][symbol] = 0             
 
 
     def get_portfolio_value(self, closing_data_df):
@@ -101,31 +79,30 @@ class Portfolio:
             float: The total value of the portfolio at the given date.
         '''
         # Turn self.holdings and self.holdings_dates into a DataFrame
-        df = pd.DataFrame(self.holdings)
-        df= df.T
+        holdings_df = pd.DataFrame(self.holdings).T
+        original_columns = holdings_df.columns #get original columns to calculate values later
 
+        #truncate the closing_data_df to the range of dates in holdings_df
+        holdings_df['Date'] = pd.to_datetime(holdings_df.index)#need to check if dates are in order
+        before = holdings_df['Date'][0]
+        after  = holdings_df['Date'][-1]
+        pr_trunc = closing_data_df.truncate(before=before, after=after)
 
+        #merge
+        merged_df = holdings_df.join(pr_trunc, on='Date', how='right', rsuffix='_prices')
+        merged_df.fillna(method='ffill', inplace=True)  # Forward fill to copy portfolio values to all dates until manually changed
+        merged_df.index =  pr_trunc.index  # Set the index to match prices_close_df
 
+        # Calculate the value held for each asset on each date
+        for col in original_columns:
+            merged_df[col + '_value'] = merged_df[col] * merged_df[col + '_prices']
 
-        # date = date.strftime('%Y-%m-%d')  # Ensure date is in string format #1
-        portfolio_value = 0
-        for i, date in enumerate(self.holdings_dates):
-            for symbol, amount in self.holdings[i].items():
-                print(f"Calculating Symbol: {symbol}, Amount: {amount}, input Date: {date}")
-                if date not in closing_data_df[symbol].index: # CHANGE CODE TO GET DATA FROM CLOSEST DATE TO THE GIVEN DATE
-                    print(f"Price for {symbol} on {date} is not available. calculating with the latest available")
-                    #change today to the latest available date in price_df
-                    date = get_closest_date_index(date, closing_data_df) # Get the last available date #2 Latest date works if we want to know closest price to today, for other dates need to calculate timedelta
-                    print(f"Using latest available date: {date}")
-                price = float(closing_data_df[symbol][date])#example date, need to be dynamic
-                if type(price) is not float:
-                    price = 0
-                value = amount * price
-                print(f"Value for {symbol}: {value}")
-                portfolio_value += float(value)
-                print(f"Current Portfolio Value: {portfolio_value}")
-        
-        
-        
-        return portfolio_value
+        # get sum of all asset values for each date
+        merged_df['Total_Value'] = merged_df[[col + '_value' for col in original_columns]].sum(axis=1)
+
+        #get new dataframe with only value columns
+        value_columns = [col + '_value' for col in original_columns] + ['Total_Value']
+        final = merged_df[['Date'] + value_columns]
+        final.set_index('Date', inplace=True)
+        return final
 
