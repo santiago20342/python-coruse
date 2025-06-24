@@ -17,7 +17,7 @@ def get_closest_date_index(date, df_original):
     #print(f"Minimum difference: {min_diff}")
     # Calculate the difference between the last date in the DataFrame and today
     index = min_diff.index[-1]
-    print (index.date())
+    #print (index.date())
     return index.date()
 
 
@@ -106,14 +106,14 @@ class Portfolio:
         #truncate the closing_data_df to the range of dates in holdings_df
         holdings_df['Date'] = pd.to_datetime(holdings_df.index)#need to check if dates are in order
         sorted_dates = sorted(holdings_df['Date'])
-        before = sorted_dates[0] - pd.Timedelta(days=1)
+        before = sorted_dates[0]
         after  = sorted_dates[-1]
         pr_trunc = closing_data_df.truncate(before=before, after=after)
 
         #merge
         merged_df = holdings_df.join(pr_trunc, on='Date', how='right', rsuffix='_prices')
         merged_df.fillna(method='ffill', inplace=True)  # Forward fill to copy portfolio values to all dates until manually changed
-        print(merged_df)
+        #print(merged_df)
         merged_df.index =  pr_trunc.index  # Set the index to match prices_close_df
 
         # Calculate the value held for each asset on each date
