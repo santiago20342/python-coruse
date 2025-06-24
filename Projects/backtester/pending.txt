@@ -13,16 +13,18 @@ s       done    2.2     Correct bug= not calculating portfolio value dynamically
 s       done    2.3     Use time deltas, turn date column to date time objects for ease of calculation)
 s       done    3.      create plot visualisations of different portfolios 
 s       done    4.      create plot visualisations for the value across time of different portfolios. 
-l       PEND    4.1     ADVANCED FEATURE Add a date for purchase of the stock, portfolio across time. (add default values too)
-l       PEND    4.2     ADVANCED FEATURE Add the number of stock held in the prices_df so we can track the value of the portfolio across time. 
-m       PEND    4.2.1   Edit the portfolio value funcition to calculate based on the new portfolio data structure
+l       done    4.1     ADVANCED FEATURE Add a date for purchase of the stock, portfolio across time. (add default values too)
+l       done    4.2     ADVANCED FEATURE Add the number of stock held in the prices_df so we can track the value of the portfolio across time. 
+m       done    4.2.1   Edit the portfolio value funcition to calculate based on the new portfolio data structure
 s       PEND    4.2.2   add a capital gains variable to keep track.
 s       PEND    4.2.3   Create a baseline budget, to keep track of networth across time. 
 s       done    4.3     Database of objects -> dictionary
+s       
 
 DATA ACQUISITION
 ------------------------
 s       done    5.      find website/API for congressmen investments and verify
+m       PEND    5.1     Download available data and create portfolios for the 100 senators and find a way to store them. 
 xl      PEND    6       get the data from the website. 
 s       done    6.1a    API (easy) -> max free data 1 month
 s       PEND    6.1a.0  create an encryption for the public key
