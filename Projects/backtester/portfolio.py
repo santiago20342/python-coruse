@@ -47,7 +47,9 @@ class Portfolio:
         self.last_name = last_name
         self.full_name = f"{self.first_name} {self.last_name}"
 
-    def add_asset(self, symbol, units, buy_date):
+
+
+    def add_asset(self, symbol, units, buy_date, buy_price):
         '''Add an asset to the portfolio.
         If the asset already exists, it will update the number of units held.
         If runnning several times, make sure dates are in chronological order.
@@ -73,10 +75,11 @@ class Portfolio:
             self.holdings[buy_date] = self.holdings[date_list[-1]].copy() #copying last portfolio state
         
         if symbol in self.holdings[buy_date].keys():
-            self.holdings[buy_date][symbol] += units
+            self.holdings[buy_date][symbol] += units 
+            self.investment[buy_date] = float(units) * buy_price #update the investment value
         else:
-            self.holdings[buy_date][symbol] = units    
-        
+            self.holdings[buy_date][symbol] = units
+            self.investment[buy_date] = float(units) * buy_price #update the investment value
 
     def remove_asset(self, symbol, units, sell_date):
         '''Remove an asset from the portfolio by selling a certain number of units.
