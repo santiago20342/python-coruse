@@ -35,14 +35,15 @@ class Portfolio:
             and units is a float representing the number of units held of that asset.'''
         self.holdings = holdings #dictionary
         self.investment = {} #dictionary
+        self.capital_gains = {} #dictionary
         #calculate the first portfolio value
         self.temp_value = 0
         for symbol, units in self.holdings[initial_date].items():
             self.temp_value += units * float(single_stock_prices[symbol])
         self.investment[initial_date] = self.temp_value
+        self.capital_gains[initial_date] = 0
         self.temp_value = 0
 
-        self.capital_gains = {} #dictionary
         self.first_name = first_name
         self.last_name = last_name
         self.full_name = f"{self.first_name} {self.last_name}"
@@ -81,7 +82,7 @@ class Portfolio:
             self.holdings[buy_date][symbol] = units
             self.investment[buy_date] = float(units) * buy_price #update the investment value
 
-    def remove_asset(self, symbol, units, sell_date):
+    def remove_asset(self, symbol, units, sell_date, historical_prices_df):
         '''Remove an asset from the portfolio by selling a certain number of units.
         If  running several times, make sure dates are in chronological order.
         Args:
@@ -89,6 +90,17 @@ class Portfolio:
             units (float): The number of units to remove.
             sell_date (pandas.Timestamp): The date on which the asset is sold.
         '''
+        # Find out last time the asset was bought. 
+        self.last_buy_date = None
+        date_list = list(sorted(self.holdings.keys(), reverse=True))
+        if len(date_list) > 1:
+            for i, date in enumerate(date_list):
+                if self.holdings[date_list[i]][symbol] > self.holdings[date_list[i-1]][symbol]:
+                    self.last_buy_date = date_list[i]
+                    pass
+        else:
+            self.last_buy_date = date_list[0]
+        capital_gain = (historical_prices_df.loc[sell_date, symbol] - historical_prices_df.loc[self.last_buy_date, symbol]) * units        
         #check if the sell date is in the holdings_dates queue
         if sell_date not in self.holdings.keys():
             date_list = list(sorted(self.holdings.keys()))
@@ -98,6 +110,8 @@ class Portfolio:
         #check if the symbol is in the holdings
         if symbol in self.holdings[sell_date].keys():
             self.holdings[sell_date][symbol] -= units
+            self.capital_gains[sell_date] = capital_gain #update the investment value
+            self.investment[sell_date] = -float(units) * historical_prices_df.loc[sell_date, symbol] #update the investment value
             if self.holdings[sell_date][symbol] < 0:
                 self.holdings[sell_date][symbol] = 0             
 
