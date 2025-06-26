@@ -36,6 +36,7 @@ class Portfolio:
         self.holdings = holdings #dictionary
         self.investment = {} #dictionary
         self.capital_gains = {} #dictionary
+        self.portfolio_value = None
         #calculate the first portfolio value
         self.temp_value = 0
         for symbol, units in self.holdings[initial_date].items():
@@ -47,6 +48,7 @@ class Portfolio:
         self.first_name = first_name
         self.last_name = last_name
         self.full_name = f"{self.first_name} {self.last_name}"
+
 
 
 
@@ -152,5 +154,5 @@ class Portfolio:
         value_columns = [col + '_value' for col in original_columns] + ['Total_Value']
         final = merged_df[['Date'] + value_columns]
         final.set_index('Date', inplace=True)
-        return final
+        self.portfolio_value = final
 
