@@ -19,6 +19,7 @@ end = '2025-01-01'
 
 #calling API to get prices
 prices_df = get_price(shares, start, end)
+prices_df = get_price(shares, start, end)
 prices_df.to_csv('prices.csv', index=True) #saving prices to csv
 #retrieving prices from csv
 prices_df = pd.read_csv('prices.csv', parse_dates=True)
