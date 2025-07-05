@@ -63,8 +63,8 @@ class Portfolio:
         #Error handling for symbol and units
         if not isinstance(symbol, str) or not isinstance(units, (int, float)):
             raise ValueError("Symbol must be a string and units must be a number.")
-        if len(symbol) != 4: 
-            raise ValueError("Symbol must be exactly 4 characters long.")
+        # if len(symbol) != 4: 
+        #     raise ValueError("Symbol must be exactly 4 characters long.")
         if units < 0:
             raise ValueError("Units cannot be negative.")
         #if buy_date is None or not isinstance(buy_date, pd.Timestamp):
