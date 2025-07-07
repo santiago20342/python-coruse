@@ -97,6 +97,10 @@ class Portfolio:
         date_list = list(sorted(self.holdings.keys(), reverse=True))
         if len(date_list) > 1:
             for i, date in enumerate(date_list):
+                if symbol not in self.holdings[date_list[i]]:
+                    self.holdings[date_list[i]][symbol] = 0 
+                if symbol not in self.holdings[date_list[i-1]]:
+                    self.holdings[date_list[i-1]][symbol] = 0 
                 if self.holdings[date_list[i]][symbol] > self.holdings[date_list[i-1]][symbol]:
                     self.last_buy_date = date_list[i]
                     pass
@@ -114,9 +118,6 @@ class Portfolio:
             self.holdings[sell_date][symbol] -= units
             self.capital_gains[sell_date] = capital_gain #update the investment value
             self.investment[sell_date] = -float(units) * historical_prices_df.loc[sell_date, symbol] #update the investment value
-            if self.holdings[sell_date][symbol] < 0:
-                self.holdings[sell_date][symbol] = 0             
-
 
     def get_portfolio_value(self, closing_data_df):
         '''Calculate the total value of the portfolio at a given date.
