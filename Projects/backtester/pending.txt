@@ -63,3 +63,7 @@ xl      NOT     6.1b.2  Scrap data from the pdf (1.5 - 2 week feature)
                         a. download pdf
                         b. identify the sheets with tables and the useful data
                         c. parse the tables and get the information into our chosen python object (Pandas DataFrame)
+
+NICE TO HAVE's
+---------------------------
+xl      PEND    xx.     Get senator portfolios from their annual declarations -> dont seem to be part of the API. 
