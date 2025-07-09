@@ -144,7 +144,17 @@ class Portfolio:
             float: The total value of the portfolio at the given date.
         '''
         # Turn self.holdings and self.holdings_dates into a DataFrame
-        holdings_df = pd.DataFrame(self.holdings).T
+        # Clean holdings: keep only the first element for each symbol
+        cleaned_holdings = {
+            date: {symbol: max(0, value[0]) if isinstance(value, list) and len(value) > 0 else value
+                   for symbol, value in symbols.items()}
+            for date, symbols in self.holdings.items()
+        }
+
+        holdings_df = pd.DataFrame(cleaned_holdings).T
+
+
+        #holdings_df = pd.DataFrame(self.holdings).T
         original_columns = holdings_df.columns #get original columns to calculate values later
 
         #truncate the closing_data_df to the range of dates in holdings_df
