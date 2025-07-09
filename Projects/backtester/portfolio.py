@@ -95,7 +95,7 @@ class Portfolio:
             sell_date (pandas.Timestamp): The date on which the asset is sold.
         '''
         # Find out last time the asset was bought. 
-        self.last_buy_date = None
+        self.last_buy_date = sell_date
         date_list = list(sorted(self.holdings.keys()))
         if len(date_list) > 1:
             for i, date in enumerate(date_list): 
@@ -122,6 +122,10 @@ class Portfolio:
         #     capital_gain = (sell_price - self.holdings[self.last_buy_date][symbol][1]) * units   
         # except:
         #     capital_gain = 0
+        if self.last_buy_date not in self.holdings:
+            self.holdings[self.last_buy_date] = {}
+        if symbol not in self.holdings[self.last_buy_date]:
+            self.holdings[self.last_buy_date][symbol] = [0, sell_price]
         capital_gain = (sell_price - self.holdings[self.last_buy_date][symbol][1]) * units 
 
         if symbol in self.holdings[sell_date].keys():
