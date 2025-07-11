@@ -30,9 +30,20 @@ class Portfolio:
 
     def __init__(self, first_name, last_name, holdings, single_stock_prices, initial_date):
         '''Initialize the portfolio with an empty dictionary to hold assets.
-            Dictionary structure: {symbol: units}
-            where symbol is the key to the dictionary, and it is a string of 4 letters (as per the normal stock symbol format), 
-            and units is a float representing the number of units held of that asset.'''
+            Arguments
+            first_name:str
+            last_name:str
+            holdings:dict
+            single_stock_prices:panda Series
+            initil_date:str
+
+            Attributes  
+            self.first_name(str):first name of every sentor
+            self.last_name(str):last name of every sentor
+            self.holding(dict):initial_date][symbol]= [float(units), float(single_stock_prices[symbol])]
+            self.single_stock_prices(panda Series): a series that hold the values of assets of the porfiolo 
+            self.initial_date(str):the date the stock was brought '''
+        
         self.holdings = holdings #dictionary
         self.investment = {} #dictionary
         self.capital_gains = {} #dictionary
@@ -61,6 +72,7 @@ class Portfolio:
         Args:
             symbol (str): The symbol of the asset to add.
             units (float): The number of units to add.
+            buy_date 
             holding(dictionary): dictionary symbol and units within it.
         '''
         #Error handling for symbol and units
