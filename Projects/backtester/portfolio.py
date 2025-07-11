@@ -57,9 +57,11 @@ class Portfolio:
         '''Add an asset to the portfolio.
         If the asset already exists, it will update the number of units held.
         If runnning several times, make sure dates are in chronological order.
+        if buy symbol in holding and date then add to it, but if not then 
         Args:
             symbol (str): The symbol of the asset to add.
             units (float): The number of units to add.
+            holding(dictionary): dictionary symbol and units within it.
         '''
         #Error handling for symbol and units
         if not isinstance(symbol, str) or not isinstance(units, (int, float)):
@@ -89,18 +91,20 @@ class Portfolio:
     def remove_asset(self, symbol, units, sell_date, sell_price):
         '''Remove an asset from the portfolio by selling a certain number of units.
         If  running several times, make sure dates are in chronological order.
+        if we don't have buy date then set it to 0 and negative for now 
         Args:
             symbol (str): The symbol of the asset to remove.
             units (float): The number of units to remove.
             sell_date (pandas.Timestamp): The date on which the asset is sold.
+            self.holding(dict):it's key is dates with nested dict with symbol,units
         '''
         # Find out last time the asset was bought. 
         self.last_buy_date = sell_date
         date_list = list(sorted(self.holdings.keys()))
         if len(date_list) > 1:
-            for i, date in enumerate(date_list): 
+            for i, date in enumerate(date_list):# the enumerate get the index of the dates and dates themself and we use it check the symbol value is in di
                 if symbol not in self.holdings[date_list[i-1]]:
-                    self.holdings[date_list[i-1]][symbol] = [0, sell_price]
+                    self.holdings[date_list[i-1]][symbol] = [0, sell_price]#set the number of stock to zero 
                 if symbol not in self.holdings[date_list[i]]:
                     self.holdings[date_list[i]][symbol] = self.holdings[date_list[i-1]][symbol]
                 if self.holdings[date_list[i]][symbol][0] > self.holdings[date_list[i-1]][symbol][0]:
@@ -110,26 +114,24 @@ class Portfolio:
             self.last_buy_date = date_list[0]
              
         #check if the sell date is in the holdings_dates queue
-        if sell_date not in self.holdings.keys():
-            date_list = list(sorted(self.holdings.keys(), reverse=True))
+        if sell_date not in self.holdings.keys(): #checks if sell date is in holding keys 
+            date_list = list(sorted(self.holdings.keys(), reverse=True))#changes the order of keys
             #copy the portfolio from last available date
             self.holdings[sell_date] = self.holdings[date_list[-1]].copy()# copy data so it is not connected to the original in case of changing
-        if symbol not in self.holdings[sell_date].keys():
-            self.holdings[sell_date][symbol] = [0, sell_price]
+        if symbol not in self.holdings[sell_date].keys(): # symbol is not in the dict then i will set the number of stock to zero
+            self.holdings[sell_date][symbol] = [0, sell_price] 
         # Get the last available date
         #check if the symbol is in the holdings
-        # try:
-        #     capital_gain = (sell_price - self.holdings[self.last_buy_date][symbol][1]) * units   
-        # except:
-        #     capital_gain = 0
         if self.last_buy_date not in self.holdings:
+            #create a dict empty if last buy date is not in holding
             self.holdings[self.last_buy_date] = {}
         if symbol not in self.holdings[self.last_buy_date]:
-            self.holdings[self.last_buy_date][symbol] = [0, sell_price]
+            self.holdings[self.last_buy_date][symbol] = [0, sell_price] #set number of stock to 0 
+        #Calculating capital gain 
         capital_gain = (sell_price - self.holdings[self.last_buy_date][symbol][1]) * units 
 
         if symbol in self.holdings[sell_date].keys():
-            self.holdings[sell_date][symbol][0] -= units
+            self.holdings[sell_date][symbol][0] -= units 
             self.capital_gains[sell_date] = capital_gain #update the investment value
             self.investment[sell_date] = -float(units) * self.holdings[sell_date][symbol][0] #update the investment value
         else:
@@ -140,11 +142,13 @@ class Portfolio:
         Args:
             closing_data_df (DataFrame): A DataFrame containing the closing prices of assets with dates as index.
             date (pandas.Timestamp): The date for which to calculate the portfolio value. Defaults to today.
+            merage_df (date frame): To join 2 portfolio into one
         Returns:
             float: The total value of the portfolio at the given date.
         '''
         # Turn self.holdings and self.holdings_dates into a DataFrame
         # Clean holdings: keep only the first element for each symbol
+        #clean holding is to get the first item of the list which is the number of stock 
         cleaned_holdings = {
             date: {symbol: max(0, value[0]) if isinstance(value, list) and len(value) > 0 else value
                    for symbol, value in symbols.items()}
@@ -152,7 +156,6 @@ class Portfolio:
         }
 
         holdings_df = pd.DataFrame(cleaned_holdings).T
-
 
         #holdings_df = pd.DataFrame(self.holdings).T
         original_columns = holdings_df.columns #get original columns to calculate values later
@@ -162,12 +165,12 @@ class Portfolio:
         sorted_dates = sorted(holdings_df['Date'])
         before = sorted_dates[0]
         after  = sorted_dates[-1]
-        pr_trunc = closing_data_df.truncate(before=before, after=after)
+        pr_trunc = closing_data_df.truncate(before=before, after=after)#to set date the data  begin and ends 
 
         #merge
-        merged_df = holdings_df.join(pr_trunc, on='Date', how='right', rsuffix='_prices')
+        #merging the holding_df with the original_columns 
+        merged_df = holdings_df.join(pr_trunc, on='Date', how='right', rsuffix='_prices')#joins two profilos together 
         merged_df.fillna(method='ffill', inplace=True)  # Forward fill to copy portfolio values to all dates until manually changed
-        #print(merged_df)
         merged_df.index =  pr_trunc.index  # Set the index to match prices_close_df
 
         # Calculate the value held for each asset on each date
@@ -182,4 +185,3 @@ class Portfolio:
         final = merged_df[['Date'] + value_columns]
         final.set_index('Date', inplace=True)
         self.portfolio_value = final
-
