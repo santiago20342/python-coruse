@@ -62,8 +62,6 @@ class Portfolio:
         self.full_name = f"{self.first_name} {self.last_name}"
 
 
-
-
     def add_asset(self, symbol, units, buy_date, buy_price):
         '''Add an asset to the portfolio.
         If the asset already exists, it will update the number of units held.
@@ -71,20 +69,17 @@ class Portfolio:
         if buy symbol in holding and date then add to it, but if not then 
         Args:
             symbol (str): The symbol of the asset to add.
-            units (float): The number of units to add.
-            buy_date 
-            holding(dictionary): dictionary symbol and units within it.
+            units (float):The number of units to add.
+            buy_date(str):date the assest was brought 
+            buy_price(str):price the asset was brought 
         '''
         #Error handling for symbol and units
         if not isinstance(symbol, str) or not isinstance(units, (int, float)):
             raise ValueError("Symbol must be a string and units must be a number.")
-        # if len(symbol) != 4: 
-        #     raise ValueError("Symbol must be exactly 4 characters long.")
+
         if units < 0:
             raise ValueError("Units cannot be negative.")
-        #if buy_date is None or not isinstance(buy_date, pd.Timestamp):
-        #   raise ValueError("Buy date must be a valid pandas Timestamp.")
-        
+
         # Add asset to the portfolio
         #check if the date provided is already in the holdings
         if buy_date not in self.holdings.keys():
@@ -108,20 +103,20 @@ class Portfolio:
             symbol (str): The symbol of the asset to remove.
             units (float): The number of units to remove.
             sell_date (pandas.Timestamp): The date on which the asset is sold.
-            self.holding(dict):it's key is dates with nested dict with symbol,units
+            sell_price(float): the price of the stock when sold
         '''
         # Find out last time the asset was bought. 
         self.last_buy_date = sell_date
         date_list = list(sorted(self.holdings.keys()))
         if len(date_list) > 1:
-            for i, date in enumerate(date_list):# the enumerate get the index of the dates and dates themself and we use it check the symbol value is in di
+            for i, date in enumerate(date_list):# the enumerate gets the index of the dates and 
+                                                # the dates themselves and we use them to check if the symbol value is in dict
                 if symbol not in self.holdings[date_list[i-1]]:
                     self.holdings[date_list[i-1]][symbol] = [0, sell_price]#set the number of stock to zero 
                 if symbol not in self.holdings[date_list[i]]:
                     self.holdings[date_list[i]][symbol] = self.holdings[date_list[i-1]][symbol]
                 if self.holdings[date_list[i]][symbol][0] > self.holdings[date_list[i-1]][symbol][0]:
                     self.last_buy_date = date_list[i]
-                    
         else:
             self.last_buy_date = date_list[0]
              
@@ -197,3 +192,5 @@ class Portfolio:
         final = merged_df[['Date'] + value_columns]
         final.set_index('Date', inplace=True)
         self.portfolio_value = final
+
+        
