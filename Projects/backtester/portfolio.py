@@ -4,10 +4,10 @@ def get_closest_date_index(date, df_original):
     """
     Get the index of the closest date in a list of dates.
     Args:
-        date (timestamp): The date to find the closest match for.
-        date_series (pandas.Series): A pandas series of pandas.Timestamp objects.
+        date (timestamp):                   The date to find the closest match for.
+        date_series (pandas.Series):        A pandas series of pandas.Timestamp objects.
     Returns:
-        int: The index of the closest date in the list.
+        nearest date (datetime.date):       The index of the closest date in the list.
     """
     # getting the closest date index
     df_with_dates = df_original.copy()
@@ -24,25 +24,30 @@ def get_closest_date_index(date, df_original):
 class Portfolio:
     """
     A class to represent a portfolio of assets.
-    Attributes:
-        holdings (dict): A dictionary where keys are asset symbols and values are the number of units held.
+    Attributes:  
+            self.first_name(str):                       first name of every sentor
+            self.last_name(str):                        last name of every sentor
+            self.holding(dict):                         initial_date][symbol]= [float(units), float(single_stock_prices[symbol])]
+            self.single_stock_prices(panda Series):     a series that hold the values of assets of the porfiolo 
+            self.initial_date(str):                     the date the stock was brough
     """
 
     def __init__(self, first_name, last_name, holdings, single_stock_prices, initial_date):
         '''Initialize the portfolio with an empty dictionary to hold assets.
-            Arguments
+            Arguments:
             first_name:str
             last_name:str
             holdings:dict
             single_stock_prices:panda Series
             initil_date:str
 
-            Attributes  
-            self.first_name(str):first name of every sentor
-            self.last_name(str):last name of every sentor
-            self.holding(dict):initial_date][symbol]= [float(units), float(single_stock_prices[symbol])]
-            self.single_stock_prices(panda Series): a series that hold the values of assets of the porfiolo 
-            self.initial_date(str):the date the stock was brought '''
+            Attributes:  
+            self.first_name(str):                       first name of every sentor
+            self.last_name(str):                        last name of every sentor
+            self.holding(dict):                         {[initial_date]:{[symbol]:[float(units), float(single_stock_prices[symbol]}}
+            self.single_stock_prices(panda Series):     a series that hold the values of assets of the porfiolo 
+            self.initial_date(str):                     the date the stock was brought 
+            '''
         
         self.holdings = holdings #dictionary
         self.investment = {} #dictionary
@@ -67,11 +72,12 @@ class Portfolio:
         If the asset already exists, it will update the number of units held.
         If runnning several times, make sure dates are in chronological order.
         if buy symbol in holding and date then add to it, but if not then 
+        
         Args:
-            symbol (str): The symbol of the asset to add.
-            units (float):The number of units to add.
-            buy_date(str):date the assest was brought 
-            buy_price(str):price the asset was brought 
+            symbol (str):           The symbol of the asset to add.
+            units (float):          The number of units to add.
+            buy_date(str):          Date the assest was brought 
+            buy_price(str):         Price the asset was brought 
         '''
         #Error handling for symbol and units
         if not isinstance(symbol, str) or not isinstance(units, (int, float)):
@@ -99,30 +105,32 @@ class Portfolio:
         '''Remove an asset from the portfolio by selling a certain number of units.
         If  running several times, make sure dates are in chronological order.
         if we don't have buy date then set it to 0 and negative for now 
+        
         Args:
-            symbol (str): The symbol of the asset to remove.
-            units (float): The number of units to remove.
-            sell_date (pandas.Timestamp): The date on which the asset is sold.
-            sell_price(float): the price of the stock when sold
+            symbol (str):                   The symbol of the asset to remove.
+            units (float):                  The number of units to remove.
+            sell_date (pandas.Timestamp):   The date on which the asset is sold.
+            sell_price(float):              The price of the stock when sold
         '''
         # Find out last time the asset was bought. 
         self.last_buy_date = sell_date
-        date_list = list(sorted(self.holdings.keys()))
+        date_list = list(sorted(self.holdings.keys()))#order from largest to smallest (newest to oldest)
         if len(date_list) > 1:
-            for i, date in enumerate(date_list):# the enumerate gets the index of the dates and 
-                                                # the dates themselves and we use them to check if the symbol value is in dict
-                if symbol not in self.holdings[date_list[i-1]]:
-                    self.holdings[date_list[i-1]][symbol] = [0, sell_price]#set the number of stock to zero 
+            for i in range(len(date_list) - 1): # the dates themselves and we use them to check if the symbol value is in dict
+                if symbol not in self.holdings[date_list[i+1]]:#checking second-newest date
+                    self.holdings[date_list[i+1]][symbol] = [0, sell_price]#set the number of stock to zero 
                 if symbol not in self.holdings[date_list[i]]:
-                    self.holdings[date_list[i]][symbol] = self.holdings[date_list[i-1]][symbol]
-                if self.holdings[date_list[i]][symbol][0] > self.holdings[date_list[i-1]][symbol][0]:
+                    self.holdings[date_list[i]][symbol] = self.holdings[date_list[i+1]][symbol]
+                if self.holdings[date_list[i]][symbol][0] > self.holdings[date_list[i+1]][symbol][0]:
                     self.last_buy_date = date_list[i]
+                else:
+                    self.last_buy_date = date_list[0]
         else:
             self.last_buy_date = date_list[0]
              
         #check if the sell date is in the holdings_dates queue
         if sell_date not in self.holdings.keys(): #checks if sell date is in holding keys 
-            date_list = list(sorted(self.holdings.keys(), reverse=True))#changes the order of keys
+            date_list = list(sorted(self.holdings.keys(), reverse=True))#order from largest to smallest (newest to oldest)
             #copy the portfolio from last available date
             self.holdings[sell_date] = self.holdings[date_list[-1]].copy()# copy data so it is not connected to the original in case of changing
         if symbol not in self.holdings[sell_date].keys(): # symbol is not in the dict then i will set the number of stock to zero
@@ -130,8 +138,9 @@ class Portfolio:
         # Get the last available date
         #check if the symbol is in the holdings
         if self.last_buy_date not in self.holdings:
+            date_list = list(sorted(self.holdings.keys(), reverse=True))#order from largest to smallest (newst to oldest)
             #create a dict empty if last buy date is not in holding
-            self.holdings[self.last_buy_date] = {}
+            self.holdings[self.last_buy_date] = self.holdings[date_list[0]].copy()# copy data so it is not connected to the original in case of changing
         if symbol not in self.holdings[self.last_buy_date]:
             self.holdings[self.last_buy_date][symbol] = [0, sell_price] #set number of stock to 0 
         #Calculating capital gain 
@@ -146,12 +155,14 @@ class Portfolio:
 
     def get_portfolio_value(self, closing_data_df):
         '''Calculate the total value of the portfolio at a given date.
+        
         Args:
-            closing_data_df (DataFrame): A DataFrame containing the closing prices of assets with dates as index.
-            date (pandas.Timestamp): The date for which to calculate the portfolio value. Defaults to today.
-            merage_df (date frame): To join 2 portfolio into one
+            closing_data_df (DataFrame):        A DataFrame containing the closing prices of assets with dates as index.
+            date (pandas.Timestamp):            The date for which to calculate the portfolio value. Defaults to today.
+            merage_df (date frame):             To join 2 portfolio into one
+       
         Returns:
-            float: The total value of the portfolio at the given date.
+            self.portfolio_value(DataFrame):    The total value of the portfolio at the given date.
         '''
         # Turn self.holdings and self.holdings_dates into a DataFrame
         # Clean holdings: keep only the first element for each symbol
@@ -191,6 +202,7 @@ class Portfolio:
         value_columns = [col + '_value' for col in original_columns] + ['Total_Value']
         final = merged_df[['Date'] + value_columns]
         final.set_index('Date', inplace=True)
+        final['yield'] = final['Total_Value'].pct_change()
         self.portfolio_value = final
 
         
