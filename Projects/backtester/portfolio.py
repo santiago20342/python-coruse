@@ -57,7 +57,7 @@ class Portfolio:
         self.temp_value = 0
         for symbol, units in self.holdings[initial_date].items():
             self.holdings[initial_date][symbol]= [float(units), float(single_stock_prices[symbol])]
-            self.temp_value += units * float(single_stock_prices[symbol])
+            self.temp_value += (units * float(single_stock_prices[symbol]))
         self.investment[initial_date] = self.temp_value
         self.capital_gains[initial_date] = 0
         self.temp_value = 0
@@ -99,7 +99,11 @@ class Portfolio:
             self.investment[buy_date] = float(units) * buy_price #update the investment value
         else:
             self.holdings[buy_date][symbol] = [units, buy_price]
+        
+        if buy_date not in self.investment:
             self.investment[buy_date] = float(units) * buy_price #update the investment value
+        else:
+            self.investment[buy_date] += float(units) * buy_price
 
     def remove_asset(self, symbol, units, sell_date, sell_price):
         '''Remove an asset from the portfolio by selling a certain number of units.
@@ -114,44 +118,58 @@ class Portfolio:
         '''
         # Find out last time the asset was bought. 
         self.last_buy_date = sell_date
-        date_list = list(sorted(self.holdings.keys()))#order from largest to smallest (newest to oldest)
+        date_list = list(sorted(self.holdings.keys(), reverse=True))# newest to oldest
+        
         if len(date_list) > 1:
             for i in range(len(date_list) - 1): # the dates themselves and we use them to check if the symbol value is in dict
                 if symbol not in self.holdings[date_list[i+1]]:#checking second-newest date
-                    self.holdings[date_list[i+1]][symbol] = [0, sell_price]#set the number of stock to zero 
+                    self.holdings[date_list[i+1]][symbol] = [0, sell_price-1]#set the number of stock to zero 
                 if symbol not in self.holdings[date_list[i]]:
                     self.holdings[date_list[i]][symbol] = self.holdings[date_list[i+1]][symbol]
-                if self.holdings[date_list[i]][symbol][0] > self.holdings[date_list[i+1]][symbol][0]:
-                    self.last_buy_date = date_list[i]
-                else:
-                    self.last_buy_date = date_list[0]
+            if self.holdings[date_list[0]][symbol][0] > self.holdings[date_list[1]][symbol][0]:
+                self.last_buy_date = date_list[1]
+            else:
+                self.last_buy_date = date_list[0]
         else:
-            self.last_buy_date = date_list[0]
-             
-        #check if the sell date is in the holdings_dates queue
+            self.last_buy_date = date_list[0] #in the case of only one date
+
+        if self.last_buy_date not in self.holdings: 
+            date_list = list(sorted(self.holdings.keys(), reverse=True))#order from largest to smallest (newst to oldest)
+            #create a dict empty if last buy date is not in holding
+            self.holdings[self.last_buy_date] = self.holdings[date_list[0]].copy()# copy data so it is not connected to the original in case of changing
+        if symbol not in self.holdings[self.last_buy_date]:
+            self.holdings[self.last_buy_date][symbol] = [0, sell_price-2] #set number of stock to 0      
+        
+        
+        #check if the sell date is in the holdings
         if sell_date not in self.holdings.keys(): #checks if sell date is in holding keys 
             date_list = list(sorted(self.holdings.keys(), reverse=True))#order from largest to smallest (newest to oldest)
             #copy the portfolio from last available date
             self.holdings[sell_date] = self.holdings[date_list[-1]].copy()# copy data so it is not connected to the original in case of changing
         if symbol not in self.holdings[sell_date].keys(): # symbol is not in the dict then i will set the number of stock to zero
-            self.holdings[sell_date][symbol] = [0, sell_price] 
-        # Get the last available date
-        #check if the symbol is in the holdings
-        if self.last_buy_date not in self.holdings:
-            date_list = list(sorted(self.holdings.keys(), reverse=True))#order from largest to smallest (newst to oldest)
-            #create a dict empty if last buy date is not in holding
-            self.holdings[self.last_buy_date] = self.holdings[date_list[0]].copy()# copy data so it is not connected to the original in case of changing
-        if symbol not in self.holdings[self.last_buy_date]:
-            self.holdings[self.last_buy_date][symbol] = [0, sell_price] #set number of stock to 0 
-        #Calculating capital gain 
-        capital_gain = (sell_price - self.holdings[self.last_buy_date][symbol][1]) * units 
+            self.holdings[sell_date][symbol] = [0, sell_price-1] 
+     
+       
 
         if symbol in self.holdings[sell_date].keys():
             self.holdings[sell_date][symbol][0] -= units 
-            self.capital_gains[sell_date] = capital_gain #update the investment value
-            self.investment[sell_date] = -float(units) * self.holdings[sell_date][symbol][0] #update the investment value
         else:
-            self.holdings[sell_date][symbol] = [-units, sell_price]  # If the symbol is not in the holdings, set it to 0 units
+            self.holdings[sell_date][symbol] = [-units, sell_price] # If the symbol is not in the holdings, set it to 0 units
+      
+
+         #Calculating capital gain 
+        capital_gain = (sell_price - self.holdings[self.last_buy_date][symbol][1]) * units 
+        if sell_date not in self.capital_gains:
+            self.capital_gains[sell_date] = capital_gain #update the investment value
+        else:
+            self.capital_gains[sell_date] += capital_gain
+        
+        if sell_date not in self.investment:
+            self.investment[sell_date] = - (float(units) * self.holdings[self.last_buy_date][symbol][1])
+        else:
+            self.investment[sell_date] -= (float(units) * self.holdings[self.last_buy_date][symbol][1])
+        
+
 
     def get_portfolio_value(self, closing_data_df):
         '''Calculate the total value of the portfolio at a given date.
