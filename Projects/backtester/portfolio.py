@@ -96,10 +96,6 @@ class Portfolio:
         if symbol in self.holdings[buy_date].keys():
             self.holdings[buy_date][symbol][1] = buy_price #update the number of units held
             self.holdings[buy_date][symbol][0] += units 
-            # if buy_date not in self.capital_gains:
-            #     self.investment[buy_date] = float(units) * buy_price #update the investment value
-            # else:
-            #     self.investment[buy_date] += (float(units) * buy_price)
         else:
             self.holdings[buy_date][symbol] = [units, buy_price]
         
@@ -124,6 +120,7 @@ class Portfolio:
         self.last_buy_date = sell_date
         date_list = list(sorted(self.holdings.keys(), reverse=True))# newest to oldest
         
+        #creating the necessary dates and daily portfolios.
         if len(date_list) > 1:
             for i in range(len(date_list) - 1): # the dates themselves and we use them to check if the symbol value is in dict
                 if symbol not in self.holdings[date_list[i+1]]:#checking second-newest date
@@ -154,7 +151,7 @@ class Portfolio:
             self.holdings[sell_date][symbol] = [0, sell_price-1] 
      
        
-
+        #updating holdings
         if symbol in self.holdings[sell_date].keys():
             self.holdings[sell_date][symbol][0] -= units 
         else:
