@@ -24,9 +24,9 @@ s       done    5       Comparing portfolios with different start dates
 DATA ACQUISITION
 ------------------------
 s       done    5.      find website/API for congressmen investments and verify
-m       PEND    5.1     Download available data and create portfolios for the 100 senators and find a way to store them. 
+m       done    5.1     Download available data and create portfolios for the 100 senators and find a way to store them. 
 m       PEND    6       get the data from the API
-m       PEND    6.0     Import data onto portfolio class structure
+m       done    6.0     Import data onto portfolio class structure
                         - Find way to use US senate list and control with declared (legal( names in the API.
                         - add to senator dictionary the transactions per senator.
                         - import that data into the portfolio class structure

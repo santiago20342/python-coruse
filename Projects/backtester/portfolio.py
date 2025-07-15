@@ -89,21 +89,25 @@ class Portfolio:
         # Add asset to the portfolio
         #check if the date provided is already in the holdings
         if buy_date not in self.holdings.keys():
-            date_list = list(sorted(self.holdings.keys(), reverse=True))
+            date_list = list(sorted(self.holdings.keys(), reverse=True))#newest to oldest
             # Sort the dates to get the last available date
-            self.holdings[buy_date] = self.holdings[date_list[-1]].copy() #copying last portfolio state
+            self.holdings[buy_date] = self.holdings[date_list[0]].copy() #copying last portfolio state
         
         if symbol in self.holdings[buy_date].keys():
             self.holdings[buy_date][symbol][1] = buy_price #update the number of units held
             self.holdings[buy_date][symbol][0] += units 
-            self.investment[buy_date] = float(units) * buy_price #update the investment value
+            # if buy_date not in self.capital_gains:
+            #     self.investment[buy_date] = float(units) * buy_price #update the investment value
+            # else:
+            #     self.investment[buy_date] += (float(units) * buy_price)
         else:
             self.holdings[buy_date][symbol] = [units, buy_price]
         
+        #calculating investment value
         if buy_date not in self.investment:
             self.investment[buy_date] = float(units) * buy_price #update the investment value
         else:
-            self.investment[buy_date] += float(units) * buy_price
+            self.investment[buy_date] += (float(units) * buy_price)
 
     def remove_asset(self, symbol, units, sell_date, sell_price):
         '''Remove an asset from the portfolio by selling a certain number of units.
@@ -163,7 +167,7 @@ class Portfolio:
             self.capital_gains[sell_date] = capital_gain #update the investment value
         else:
             self.capital_gains[sell_date] += capital_gain
-        
+        #calculating investment value
         if sell_date not in self.investment:
             self.investment[sell_date] = - (float(units) * self.holdings[self.last_buy_date][symbol][1])
         else:
