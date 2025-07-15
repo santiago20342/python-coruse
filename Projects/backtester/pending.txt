@@ -45,6 +45,7 @@ l       PEND    7.      build an index of congress investments to replicate.
 m/xl    PEND    8.1     backtesting of strategies. 
 m/l     PEND    9.      Automatic updating of the data (raspberry)
 xl      PEND    10.     Front-End interface for interacting with the platform.
+m       PEND    10.1    API gives declaration date, and purchase date. Include declaration date into the strategies for copying. 
 
 FRONTEND
 -------------------------

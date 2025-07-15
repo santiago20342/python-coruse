@@ -18,3 +18,11 @@ def plot_df_prices_lines(portfolio_list):
     plt.title("Portfolio Values (from inception)")
     plt.show()
 
+
+def plot_df_networth_lines(portfolio_list):
+    plt.figure(figsize=(10,6))
+    for portfolio in portfolio_list:   
+        plt.plot(portfolio.networth.index, portfolio.networth['Net_worth'], label=portfolio.full_name)
+    plt.legend()
+    plt.title("Portfolio Values (from inception)")
+    plt.show()

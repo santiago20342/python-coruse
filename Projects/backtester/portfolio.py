@@ -224,4 +224,25 @@ class Portfolio:
         final['yield'] = final['Total_Value'].pct_change()
         self.portfolio_value = final
 
+    def get_net_worth(self):
+        """Calculate the net worth of the portfolio."""
+        investment_df = pd.DataFrame(self.investment, index= ["investment_value"]).T
+        investment_df.index.name = 'Date'
+        investment_df.index = pd.to_datetime(investment_df.index)
+        cap_gains_df = pd.DataFrame(self.capital_gains, index= ["capital_gains"]).T
+        cap_gains_df.index.name = 'Date'
+        cap_gains_df.index = pd.to_datetime(cap_gains_df.index)
+        port_tot_val = self.portfolio_value[['Total_Value']]
+
+        #merge
+        #merging the holding_df with the original_columns 
+        merged_df = port_tot_val.join(investment_df, on='Date', how='left', rsuffix='_A').join(cap_gains_df, on='Date', how='left', rsuffix='_Investment') 
+        merged_df.fillna(0, inplace=True)  # Forward fill to copy portfolio values to all dates until manually changed
+        #adding cumsums
+        merged_df['investment_value_cumsum'] = merged_df['investment_value'].cumsum()
+        merged_df['capital_gains_cumsum'] = merged_df['capital_gains'].cumsum()
+        merged_df['Net_worth'] = merged_df['Total_Value'] - merged_df['investment_value_cumsum']  # Calculate net worth as total value plus capital gains
+        merged_df['nw_yield'] = merged_df['Net_worth'].pct_change()
+        self.networth = merged_df[['Net_worth']] 
         
+    
